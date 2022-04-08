@@ -1,0 +1,176 @@
+<div>
+  <p>{{ pageSummary }}</p>
+</div>
+
+<div class="table" (click)="hideContextMenu()" (oncontextmenu)="(false)">
+  <div *ngIf="isLoading" class="loading"></div>
+
+  <p-multiSelect
+    (onChange)="onColumnsChange($event)"
+    defaultLabel="Visar {{ itemColumns.length }} kolumner"
+    [displaySelectedLabel]="false"
+    [options]="itemColumnsAll"
+    [(ngModel)]="itemColumns"
+    optionLabel="header"
+    styleClass="dropdown"
+  ></p-multiSelect>
+
+  <table class="header">
+    <thead>
+      <th
+        *ngFor="let column of itemColumns; let idx = index"
+        [style.width.px]="column.width"
+      >
+        <a (click)="sortBy($event, column.field)"
+          >{{ column.header }}
+          <span *ngIf="lastSort !== column.field">&#8645;</span>
+          <span *ngIf="lastSort === column.field && lastSortOrder == 1"
+            >&#8593;</span
+          >
+          <span *ngIf="lastSort === column.field && lastSortOrder == -1"
+            >&#8595;</span
+          >
+        </a>
+        <p-multiSelect
+          defaultLabel=""
+          [displaySelectedLabel]="false"
+          [options]="itemsDistinctByColumn[idx]"
+          [(ngModel)]="itemsDistinctByColumnFiltered[idx]"
+          [virtualScroll]="true"
+          [itemSize]="20"
+          (onChange)="onFilter()"
+          [showToggleAll]="true"
+          styleClass="dropdown"
+        ></p-multiSelect>
+      </th>
+    </thead>
+  </table>
+
+  <div #myTable class="scroll">
+    <div class="preBody" [style.height.px]="preBodyHeight"></div>
+
+    <table class="body">
+      <tr
+        *ngFor="let item of itemsVirtual; let idx = index"
+        style="height: 30px"
+        (contextmenu)="onRightClick($event, item)"
+      >
+        <ng-container
+          *ngIf="item && openRow !== item.nr && openRowLast !== item.nr"
+        >
+          <td
+            *ngFor="let column of itemColumns"
+            [style.width.px]="column.width"
+          >
+            <ng-container [ngSwitch]="column.field">
+              <ng-container *ngSwitchCase="'nr'">
+                <a (click)="openThisRow(item)">{{ item.nr }}</a>
+              </ng-container>
+              <ng-container *ngSwitchCase="'year'">
+                {{ item.year }}
+              </ng-container>
+              <ng-container *ngSwitchCase="'color'">
+                {{ item.color }}
+              </ng-container>
+            </ng-container>
+          </td>
+        </ng-container>
+
+        <ng-container
+          *ngIf="item && (openRow === item.nr || openRowLast === item.nr)"
+        >
+          <td
+            [attr.colspan]="itemColumns.length"
+            style="padding: 0; position: relative"
+          >
+            <div
+              *ngIf="openRow === item.nr && isLoadingSubtable"
+              class="loading"
+            ></div>
+
+            <table style="width: 100%; border-spacing: 0">
+              <tr style="height: 30px">
+                <td
+                  *ngFor="let column of itemColumns"
+                  [style.width.px]="column.width"
+                >
+                  <ng-container [ngSwitch]="column.field">
+                    <ng-container *ngSwitchCase="'nr'">
+                      <a (click)="openThisRow(item)">{{ item.nr }}</a>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'year'">
+                      {{ item.year }}
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'color'">
+                      {{ item.color }}
+                    </ng-container>
+                  </ng-container>
+                </td>
+              </tr>
+            </table>
+
+            <div
+              class="rowExpandContainer"
+              [ngClass]="{ isOpen: openRow == item.nr && subtable.length > 0 }"
+            >
+              <table class="rowExpandHeader">
+                <thead>
+                  <th
+                    *ngFor="let subColumn of subtableColumns"
+                    [style.width.px]="subColumn.width"
+                  >
+                    {{ subColumn.header }}
+                  </th>
+                </thead>
+              </table>
+
+              <div class="rowExpandScroll">
+                <table class="rowExpand">
+                  <tr
+                    *ngFor="
+                      let subitem of openRow === item.nr
+                        ? subtable
+                        : subtableLast
+                    "
+                  >
+                    <td
+                      *ngFor="let subColumn of subtableColumns"
+                      [style.width.px]="subColumn.width"
+                    >
+                      <ng-container [ngSwitch]="subColumn.field">
+                        <ng-container *ngSwitchCase="'nr'">
+                          {{ subitem.nr }}
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'year'">
+                          {{ subitem.year }}
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'color'">
+                          {{ subitem.color }}
+                        </ng-container>
+                      </ng-container>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="!item" style="height: 30px">
+          <td [attr.colspan]="itemColumns.length"></td>
+        </ng-container>
+      </tr>
+    </table>
+
+    <div class="postBody" [style.height.px]="postBodyHeight"></div>
+  </div>
+</div>
+
+<div *ngIf="isContextmenuOpen">
+  <app-contextmenu
+    [x]="contextmenuX"
+    [y]="contextmenuY"
+    [menuitems]="getContextMenuOptions()"
+    (menuItemSelected)="handleContextMenuSelection($event)"
+  ></app-contextmenu>
+</div>

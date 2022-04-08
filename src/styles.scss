@@ -1,1 +1,41 @@
 /* You can add global styles to this file, and also import other style files */
+
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+  border-color: #666 !important;
+  background: #666 !important;
+}
+
+.p-checkbox,
+.p-checkbox .p-checkbox-box {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.p-inputtext {
+  padding: 3px 30px 3px 3px !important;
+}
+
+p-multiselect {
+  margin: 3px;
+  display: inline-blocK;
+}
+
+.p-multiselect .p-multiselect-label {
+  padding: 3px !important;
+}
+
+.p-multiselect-label-empty {
+  width: 0;
+}
+
+.p-multiselect .p-multiselect-trigger {
+  width: 20px !important;
+}
+
+.p-multiselect-panel {
+  box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.25) !important;
+}

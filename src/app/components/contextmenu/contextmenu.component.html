@@ -1,0 +1,7 @@
+<div class="contextmenu" [ngStyle]="{ 'left.px': x, 'top.px': y }">
+  <table>
+    <tr *ngFor="let menuItem of theMenuItems">
+      <td (click)="outputSelectedMenuItem(menuItem)">{{ menuItem }}</td>
+    </tr>
+  </table>
+</div>
